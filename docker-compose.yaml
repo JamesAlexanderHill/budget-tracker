@@ -1,0 +1,22 @@
+version: '3'
+services:
+  client:
+    build: ./client/
+    volumes:
+      - ./client/public:/app/public
+      - ./client/src:/app/src
+    ports:
+      - '3000:3000'
+  strapi:
+    build: ./strapi/
+    volumes:
+      - ./strapi/.cache:/srv/app/.cache
+      - ./strapi/.tmp:/srv/app/.tmp
+      - ./strapi/api:/srv/app/api
+      - ./strapi/build:/srv/app/build
+      - ./strapi/config:/srv/app/config
+      - ./strapi/exports:/srv/app/exports
+      - ./strapi/extensions:/srv/app/extensions
+      - ./strapi/public:/srv/app/public
+    ports:
+      - '1337:1337'
