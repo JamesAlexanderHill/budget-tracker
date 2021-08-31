@@ -1,30 +1,28 @@
-import {
-    useHistory,
-    useLocation,
-} from "react-router-dom";
+import styled from 'styled-components';
 
-import { useAuth } from "../../state/auth";
+import T02Login from "../../components/template/02-login";
+import O01LoginForm from "../../components/organism/01-login-form";
 
+const StyledT02Login = styled(T02Login)`
+`;
+const StyledO01LoginForm = styled(O01LoginForm)`
 
-const P02Login = () => {
-    let history = useHistory();
-    let location = useLocation();
-    let auth = useAuth();
+`;
+const RightSide = styled.div`
+    background-image: url("https://www.canstar.com.au/wp-content/uploads/2021/03/how-to-make-a-budget-in-6-easy-steps.jpg");
+    background-repeat: no-repeat;
+    background-position: right center;
+    background-size: cover;
+    height: 100%;
+`;
 
-    let { from } = location.state || { from: { pathname: "/" } };
-    let login = () => {
-        auth.signin(() => {
-        history.replace(from);
-        });
-    };
-
+const P02Login = (props) => {
+    console.log('props', props);
     return (
-        <main className="P02Login">
-            <h1>Login Page</h1>
-            <p>Login to a user account</p>
-            <p>You must log in to view the page at {from.pathname}</p>
-            <button onClick={login}>Log in</button>
-        </main>
+        <StyledT02Login
+            left={<StyledO01LoginForm />}
+            right={<RightSide />}
+        />
     );
 }
 
