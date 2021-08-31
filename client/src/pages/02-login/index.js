@@ -1,10 +1,12 @@
 import {
     useHistory,
     useLocation,
-  } from "react-router-dom";
+} from "react-router-dom";
+
+import { useAuth } from "../../state/auth";
 
 
-const P02Login = ({useAuth}) => {
+const P02Login = () => {
     let history = useHistory();
     let location = useLocation();
     let auth = useAuth();

@@ -1,74 +1,17 @@
-import React, { useContext, createContext, useState } from "react";
+import React from "react";
 import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link,
   Redirect,
   useHistory,
-  useLocation
 } from "react-router-dom";
 
-// import { useAuth, ProvideAuth } from './state/auth';
+import { useAuth, ProvideAuth } from './state/auth';
 
 // import P01Home from './pages/01-home';
 import P02Login from './pages/02-login';
 import P03Dashboard from './pages/03-dashboard';
-
-const fakeAuth = {
-  isAuthenticated: false,
-  signin(cb) {
-    fakeAuth.isAuthenticated = true;
-    setTimeout(cb, 100); // fake async
-  },
-  signout(cb) {
-    fakeAuth.isAuthenticated = false;
-    setTimeout(cb, 100);
-  }
-};
-
-/** For more details on
- * `authContext`, `ProvideAuth`, `useAuth` and `useProvideAuth`
- * refer to: https://usehooks.com/useAuth/
- */
-const authContext = createContext();
-
-function ProvideAuth({ children }) {
-  const auth = useProvideAuth();
-  return (
-    <authContext.Provider value={auth}>
-      {children}
-    </authContext.Provider>
-  );
-}
-
-const useAuth = () => {
-  return useContext(authContext);
-}
-
-function useProvideAuth() {
-  const [user, setUser] = useState(null);
-
-  const signin = cb => {
-    return fakeAuth.signin(() => {
-      setUser("user");
-      cb();
-    });
-  };
-
-  const signout = cb => {
-    return fakeAuth.signout(() => {
-      setUser(null);
-      cb();
-    });
-  };
-
-  return {
-    user,
-    signin,
-    signout
-  };
-}
 
 function AuthButton() {
   let history = useHistory();
@@ -112,70 +55,40 @@ function PrivateRoute({ children, ...rest }) {
     />
   );
 }
-
-function PublicPage() {
-  return <h3>Public</h3>;
-}
-
-function ProtectedPage({AuthButton}) {
-  return (
-    <main>
-      <h3>Protected</h3>
-      {AuthButton}
-    </main>
-  );
-}
-
-function LoginPage() {
-  let history = useHistory();
-  let location = useLocation();
+function LoginRoute({ children, ...rest }) {
   let auth = useAuth();
-
-  let { from } = location.state || { from: { pathname: "/" } };
-  let login = () => {
-    auth.signin(() => {
-      history.replace(from);
-    });
-  };
-
   return (
-    <div>
-      <p>You must log in to view the page at {from.pathname}</p>
-      <button onClick={login}>Log in</button>
-    </div>
+    <Route
+      {...rest}
+      render={({ location }) =>
+        auth.user ? (
+          children
+        ) : (
+          <Redirect
+            to={{
+              pathname: "/login",
+              state: { from: location }
+            }}
+          />
+        )
+      }
+    />
   );
 }
 
 const App = () => {
 
   return (
-    // <ProvideAuth authContext={authContext}>
-    //   <Router>
-    //     <div>
-    //       {/* <P01Home AuthButton={AuthButton} /> */}
-    //       <Switch>
-    //         <Route path="/login">
-    //           <P02Login />
-    //         </Route>
-    //         <PrivateRoute path="/">
-    //           <P03Dashboard AuthButton={AuthButton} />
-    //         </PrivateRoute>
-    //       </Switch>
-    //     </div>
-    //   </Router>
-    // </ProvideAuth>
     <ProvideAuth>
       <Router>
-        <div>
-          <Switch>
-            <Route path="/login">
-              <P02Login useAuth={useAuth} />
-            </Route>
-            <PrivateRoute path="/">
-              <P03Dashboard AuthButton={<AuthButton />} />
-            </PrivateRoute>
-          </Switch>
-        </div>
+        <Switch>
+          <Route path="/login">
+            <P02Login />
+          </Route>
+          <PrivateRoute path="/">
+            <P03Dashboard AuthButton={<AuthButton />} />
+          </PrivateRoute>
+        </Switch>
       </Router>
     </ProvideAuth>
   );
